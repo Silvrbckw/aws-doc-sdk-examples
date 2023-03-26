@@ -68,49 +68,55 @@ class Scanner:
 
     def hello(self):
         self._load_examples()
-        hello = {}
-        for example_name, example in self.example_meta.items():
-            if example['category'] == config.categories['hello'] and self.lang_name in example['languages']:
-                hello[example_name] = example
-        return hello
+        return {
+            example_name: example
+            for example_name, example in self.example_meta.items()
+            if example['category'] == config.categories['hello']
+            and self.lang_name in example['languages']
+        }
 
     def actions(self):
         self._load_examples()
-        actions = {}
-        for example_name, example in self.example_meta.items():
-            if not example['category'] and self.lang_name in example['languages']:
-                actions[example_name] = example
-        return actions
+        return {
+            example_name: example
+            for example_name, example in self.example_meta.items()
+            if not example['category'] and self.lang_name in example['languages']
+        }
 
     def scenarios(self):
         self._load_examples()
-        scenarios = {}
-        for example_name, example in self.example_meta.items():
-            if example['category'] == config.categories['scenarios'] and self.lang_name in example['languages']:
-                scenarios[example_name] = example
-        return scenarios
+        return {
+            example_name: example
+            for example_name, example in self.example_meta.items()
+            if example['category'] == config.categories['scenarios']
+            and self.lang_name in example['languages']
+        }
 
     def crosses(self):
         self._load_cross()
-        crosses = {}
-        for example_name, example in self.cross_meta.items():
-            if self.lang_name in example['languages'] and self.svc_name in example['services']:
-                crosses[example_name] = example
-        return crosses
+        return {
+            example_name: example
+            for example_name, example in self.cross_meta.items()
+            if self.lang_name in example['languages']
+            and self.svc_name in example['services']
+        }
 
     def snippet(self, example, sdk_ver, readme_folder, api_name):
         github = None
         tag = None
         tag_path = None
         for ex_ver in example['languages'][self.lang_name]['versions']:
-            if ex_ver['sdk_version'] == sdk_ver:
-                if 'github' in ex_ver and 'excerpts' in ex_ver:
-                    github = ex_ver['github']
-                    for t in ex_ver['excerpts'][0]['snippet_tags']:
-                        if api_name in t:
-                            tag = t
-                    if tag is None:
-                        tag = ex_ver['excerpts'][0]['snippet_tags'][0]
+            if (
+                ex_ver['sdk_version'] == sdk_ver
+                and 'github' in ex_ver
+                and 'excerpts' in ex_ver
+            ):
+                github = ex_ver['github']
+                for t in ex_ver['excerpts'][0]['snippet_tags']:
+                    if api_name in t:
+                        tag = t
+                if tag is None:
+                    tag = ex_ver['excerpts'][0]['snippet_tags'][0]
         if github is not None:
             for root, dirs, files in os.walk(github):
                 for f in files:
